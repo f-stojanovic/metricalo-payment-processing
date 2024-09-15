@@ -20,5 +20,13 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Manager\Shift4ClientManager:
+        arguments:
+            $apiKey: '%env(SHIFT4_API_KEY)%'
+
+    App\Manager\ACIClientManager:
+        arguments:
+            $token: '%env(ACI_TOKEN)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

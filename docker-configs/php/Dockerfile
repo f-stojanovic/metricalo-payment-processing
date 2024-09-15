@@ -1,39 +1,29 @@
-FROM php:8.2-fpm
+#docker/php
+FROM php:8.2-fpm-buster
 
 RUN apt-get update && apt-get install -y \
+    gnupg \
+    g++ \
+    procps \
+    openssl \
     git \
     unzip \
-    libicu-dev \
-    libpq-dev \
-    wget \
-    && apt-get install -y \
-    librabbitmq-dev \
-    libssh-dev \
-    sqlite3 \
-    libsqlite3-dev \
-    && docker-php-ext-install \
-    bcmath \
-    sockets \
-    pdo pdo_mysql pdo_sqlite \
-    && pecl install amqp \
-    && docker-php-ext-enable amqp
+    zlib1g-dev \
+    libzip-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libicu-dev  \
+    libonig-dev \
+    libxslt1-dev \
+    acl \
+    && echo 'alias sf="php bin/console"' >> ~/.bashrc
 
-# Installing Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && composer --version
+RUN docker-php-ext-configure gd --with-jpeg --with-freetype 
 
-RUN apt-get -y install cron default-mysql-client
-RUN curl -sS https://get.symfony.com/cli/installer | bash
-RUN mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+RUN docker-php-ext-install \
+    pdo pdo_mysql zip xsl gd intl opcache exif mbstring
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /app
-
-# Copy application files into the container
-COPY . /app
-
-RUN composer install
-
-# Expose port 9000 for the PHP-FPM server
-EXPOSE 9000
-
-# The startup command to run PHP-FPM
-CMD ["/usr/local/bin/symfony", "server:start", "--allow-http", "--port=9000"]

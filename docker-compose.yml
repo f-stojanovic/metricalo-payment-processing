@@ -1,0 +1,16 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - "./docker-configs/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - ".:/app:cached"
+  php:
+    build:
+      context: ./docker-configs/php
+    volumes:
+      - "./docker-configs/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
+      - ".:/app:cached"
+    environment:
+      PHP_IDE_CONFIG: "serverName=Docker"
